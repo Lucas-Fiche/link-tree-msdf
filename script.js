@@ -1,16 +1,11 @@
 /*
   Mulher Segura DF — links
   --------------------------------------------------
-  Substitua APENAS os links abaixo quando tiver as URLs
-  oficiais das lojas Android e iOS.
+  Os links dos botões ficam direto no index.html (atributo href).
+  Aqui fica apenas o botão "Compartilhe esta página".
 */
 
-const LINKS = {
-  website: "https://rbcip.org",
-  android: "https://play.google.com/store/apps/details?id=org.rbcip.mulhersegura&hl=pt_BR",
-  ios: "https://apps.apple.com/br/app/mulher-segura-df/id6809001194",
-  about: "https://rbcip.org"
-};
+const PAGE_URL = "https://msdflinks.rbcip.org/";
 
 const toast = document.getElementById("toast");
 
@@ -24,36 +19,11 @@ function showToast(message) {
   }, 2800);
 }
 
-function isPlaceholder(url) {
-  return !url || url.startsWith("COLE_AQUI") || url === "#";
-}
-
-document.querySelectorAll("[data-link]").forEach((element) => {
-  const key = element.dataset.link;
-  const url = LINKS[key];
-
-  if (!isPlaceholder(url)) {
-    element.href = url;
-  }
-
-  element.addEventListener("click", (event) => {
-    if (isPlaceholder(url)) {
-      event.preventDefault();
-
-      if (key === "android") {
-        showToast("Adicione no script.js o link oficial da Google Play.");
-      } else if (key === "ios") {
-        showToast("Adicione no script.js o link oficial da App Store.");
-      }
-    }
-  });
-});
-
 document.getElementById("shareButton").addEventListener("click", async () => {
   const shareData = {
     title: "Mulher Segura DF",
     text: "Acesse os canais oficiais do Mulher Segura DF.",
-    url: LINKS.website
+    url: PAGE_URL
   };
 
   try {
@@ -62,11 +32,11 @@ document.getElementById("shareButton").addEventListener("click", async () => {
       return;
     }
 
-    await navigator.clipboard.writeText(LINKS.website);
+    await navigator.clipboard.writeText(PAGE_URL);
     showToast("Link copiado para a área de transferência.");
   } catch (error) {
     if (error?.name !== "AbortError") {
-      showToast("Não foi possível compartilhar. Acesse rbcip.org.");
+      showToast("Não foi possível compartilhar. Acesse msdflinks.rbcip.org.");
     }
   }
 });
