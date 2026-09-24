@@ -8,7 +8,7 @@
 const LINKS = {
   website: "https://rbcip.org",
   android: "https://play.google.com/store/apps/details?id=org.rbcip.mulhersegura&hl=pt_BR",
-  ios: "COLE_AQUI_O_LINK_DA_APP_STORE",
+  ios: "https://apps.apple.com/br/app/mulher-segura-df/id6809001194",
   about: "https://rbcip.org"
 };
 
