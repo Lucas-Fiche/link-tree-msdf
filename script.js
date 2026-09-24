@@ -9,14 +9,52 @@ const PAGE_URL = "https://msdflinks.rbcip.org/";
 
 const toast = document.getElementById("toast");
 
-function showToast(message) {
+function showToast(message, duration = 2800) {
   toast.textContent = message;
   toast.classList.add("is-visible");
 
   window.clearTimeout(showToast.timer);
   showToast.timer = window.setTimeout(() => {
     toast.classList.remove("is-visible");
-  }, 2800);
+  }, duration);
+}
+
+// Cópia "à moda antiga": funciona mesmo sem HTTPS e em navegadores
+// internos de apps (Instagram, Facebook), onde a Clipboard API falha.
+function legacyCopy(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.top = "0";
+  textarea.style.opacity = "0";
+  textarea.style.fontSize = "16px"; // evita zoom automático no iOS
+  document.body.appendChild(textarea);
+
+  textarea.select();
+  textarea.setSelectionRange(0, text.length);
+
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch {
+    copied = false;
+  }
+
+  textarea.remove();
+  return copied;
+}
+
+async function copyText(text) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // segue para a cópia alternativa
+  }
+  return legacyCopy(text);
 }
 
 document.getElementById("shareButton").addEventListener("click", async () => {
@@ -26,17 +64,21 @@ document.getElementById("shareButton").addEventListener("click", async () => {
     url: PAGE_URL
   };
 
-  try {
-    if (navigator.share) {
+  if (navigator.share) {
+    try {
       await navigator.share(shareData);
       return;
-    }
-
-    await navigator.clipboard.writeText(PAGE_URL);
-    showToast("Link copiado para a área de transferência.");
-  } catch (error) {
-    if (error?.name !== "AbortError") {
-      showToast("Não foi possível compartilhar. Acesse msdflinks.rbcip.org.");
+    } catch (error) {
+      // Usuária cancelou: não faz nada.
+      if (error?.name === "AbortError") return;
+      // Qualquer outro erro: tenta copiar o link.
     }
   }
+
+  if (await copyText(PAGE_URL)) {
+    showToast("Link copiado! Agora é só colar e enviar.");
+    return;
+  }
+
+  showToast("Copie e compartilhe: msdflinks.rbcip.org", 6000);
 });
